@@ -118,22 +118,18 @@ impl GameContext<'_> {
                     player.vv = -self.max_vv;
                 }
             }  // End player borrow
-
+            // Player-to-player interactions
             for oi in 0..self.players.len() {
                 // Avoid collision in the same object
                 if pi == oi { continue; }
+                // Check for actual collision
                 if !self.players[pi].pos.has_intersection(self.players[oi].pos) { continue; }
-
                 // Here we know we have collision
+                let collision = self.players[pi].pos.intersection(self.players[oi].pos).unwrap();
+                // println!("{:#?}", collision);
 
-                // println!("{:#?}", self.players[pi].pos.intersection(self.players[oi].pos).unwrap());
-                if self.players[pi].pos.x() > self.players[oi].pos.x() {
-                    self.players[pi].hv += self.players[oi].hv;
-                } else {
-                    self.players[pi].hv -= self.players[oi].hv;
-                }
-
-                // This doesn't work
+                // TODO: This doesn't work
+                /*
                 let px = self.players[pi].pos.x();
                 let py = self.players[pi].pos.y();
                 let pw = self.players[pi].pos.width() as i32;
@@ -141,16 +137,29 @@ impl GameContext<'_> {
                 let ox = self.players[oi].pos.x();
                 let oy = self.players[oi].pos.y();
                 let ow = self.players[oi].pos.width() as i32;
+                let oh = self.players[oi].pos.height() as i32;
 
-                if (py + ph) >= oy && ((px > ox && (ox + ow) < px) || ((px + pw) > ox && (ox + ow) < (px + pw))) {
+                // println!("{:#?}", self.players[pi].pos.intersection(self.players[oi].pos).unwrap());
+                // self.players[pi].hv += self.players[oi].hv;
+
+                let collision_size = (collision.width() * collision.height()) as f32;
+                let push_back = (collision_size * 0.005) as i32;
+                // if px > ox && px + pw < ox {
+                    self.players[pi].hv += push_back;
+                //}
+                self.players[pi].vv += push_back;
+                if py < oy && ((px > ox && px < (ox + ow)) || ((px + pw) > ox && (px + pw) < (ox + ow))) {
                     // delta_y = delta;
                     if self.players[pi].is_jump { self.players[pi].is_jump = false; }
-                    self.players[pi].vv = 0;
-                    let new_y = oy - ph;
-                    self.players[pi].pos.set_y(new_y);
-                }/* else {
+                    let cs = self.players[pi].pos.intersection(self.players[oi].pos).unwrap();
+                    let collision_size = (cs.width() * cs.height()) as f32;
+                    self.players[pi].vv += (collision_size * 0.001) as i32;  // = self.gravity;
+                    // let new_y = oy - oh;
+                    // self.players[pi].pos.set_y(new_y);
+                } else {
                     delta_y += 10;
-                }*/
+                }
+                */
             }
             // Finally we apply movement
             {  // Borrow player here
@@ -159,7 +168,6 @@ impl GameContext<'_> {
                 let new_pos: f32 = (player.pos.x() + player.hv) as f32;
                 // Limit movement out of the srceen
                 if new_pos > ((0 as f32) - (player.pos.width() as f32) * 0.3) && new_pos < ((self.window_w as f32) - (player.pos.width() as f32) * 0.7) {
-                    player.hv = 0;
                     player.pos.set_x(new_pos as i32);
                 }
                 // Vertical movement
@@ -172,6 +180,9 @@ impl GameContext<'_> {
                     player.pos.set_y(self.platform.pos.y() - (player.pos.height() as i32));
                 }
             }  // End player borrow
+        }
+        for player in &mut self.players {
+            player.hv = 0;
         }
     }
 }

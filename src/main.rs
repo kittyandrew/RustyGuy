@@ -19,7 +19,7 @@ const MAX_VELOCITY: i32 = 120;
 const WINDOW_W: u32 = 1500;
 const WINDOW_H: u32 = 1000;
 const PLAYER_W: u32 = 128;
-const PLAYER_H: u32 = 64;
+const PLAYER_H: u32 = 44;
 
 
 fn handle_events(event_pump: &mut sdl2::EventPump, context: &mut GameContext) {
@@ -102,7 +102,7 @@ fn main() {
                 id: 0,
                 texture: surface.as_texture(&texture_creator).unwrap(),
                 // Original generate size: (272, 77)
-                src: Rect::new(0, 0, 272-8, 77),
+                src: Rect::new(0, 20, 272-8, 77),
                 pos: Rect::new(400 - 32, 500 - 32, PLAYER_W, PLAYER_H),
                 name: dname.as_texture(&texture_creator).unwrap(),
                 speed: 7,
@@ -115,7 +115,7 @@ fn main() {
                 id: 1,
                 texture: surface.as_texture(&texture_creator).unwrap(),
                 // Original generate size: (272, 77)
-                src: Rect::new(0, 0, 272-8, 77),
+                src: Rect::new(0, 20, 272-8, 77),
                 pos: Rect::new((WINDOW_W / 2 - 500) as i32, 500 - 32, PLAYER_W, PLAYER_H),
                 name: hoe_name.as_texture(&texture_creator).unwrap(),
                 speed: 7,
