@@ -14,7 +14,7 @@ use entities::{GameContext, Object, Agent};
 
 
 const TRASHGUY: &'static str = "(> ^_^)>";
-const GRAVITY: i32 = 3;
+const GRAVITY: i32 = 15;
 const MAX_VELOCITY: i32 = 120;
 const WINDOW_W: u32 = 1500;
 const WINDOW_H: u32 = 1000;
@@ -23,6 +23,7 @@ const PLAYER_H: u32 = 44;
 
 
 fn handle_events(event_pump: &mut sdl2::EventPump, context: &mut GameContext) {
+    let mut ctrl = false;
     for event in event_pump.poll_iter() {
         match event {
             Event::Quit {..} |
@@ -30,16 +31,29 @@ fn handle_events(event_pump: &mut sdl2::EventPump, context: &mut GameContext) {
                 context.running = false;
                 break
             },
+            Event::KeyDown { keycode: Some(Keycode::RCtrl), .. } |
+            Event::KeyDown { keycode: Some(Keycode::LCtrl), .. } => {
+                ctrl = true;
+            },
             _ => {},
         }
     }
+
     for code in event_pump.keyboard_state().pressed_scancodes() {
         match code {
+            Scancode::R => {
+                if ctrl {
+                    // TODO: Restart the game
+                    println!("RESTART!");
+                    context.running = false;
+                    break
+                }
+            },
             Scancode::W  |
             Scancode::Up => {
                 if context.players[0].is_jump { continue }
                 context.players[0].is_jump = true;
-                context.players[0].vv += 34;
+                context.players[0].vv += 80;
             },
             Scancode::D     |
             Scancode::Right => {

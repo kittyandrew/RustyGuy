@@ -129,7 +129,7 @@ impl GameContext<'_> {
                 // println!("{:#?}", collision);
 
                 // TODO: This doesn't work
-                /*
+
                 let px = self.players[pi].pos.x();
                 let py = self.players[pi].pos.y();
                 let pw = self.players[pi].pos.width() as i32;
@@ -142,24 +142,21 @@ impl GameContext<'_> {
                 // println!("{:#?}", self.players[pi].pos.intersection(self.players[oi].pos).unwrap());
                 // self.players[pi].hv += self.players[oi].hv;
 
-                let collision_size = (collision.width() * collision.height()) as f32;
-                let push_back = (collision_size * 0.005) as i32;
-                // if px > ox && px + pw < ox {
-                    self.players[pi].hv += push_back;
-                //}
-                self.players[pi].vv += push_back;
-                if py < oy && ((px > ox && px < (ox + ow)) || ((px + pw) > ox && (px + pw) < (ox + ow))) {
-                    // delta_y = delta;
-                    if self.players[pi].is_jump { self.players[pi].is_jump = false; }
-                    let cs = self.players[pi].pos.intersection(self.players[oi].pos).unwrap();
-                    let collision_size = (cs.width() * cs.height()) as f32;
-                    self.players[pi].vv += (collision_size * 0.001) as i32;  // = self.gravity;
-                    // let new_y = oy - oh;
-                    // self.players[pi].pos.set_y(new_y);
-                } else {
-                    delta_y += 10;
+                let cw = collision.width() as i32;
+                let ch = collision.height() as i32;
+                // println!("X1: {} X2: {}", px, collision.x());
+                if px + pw / 2 > collision.x() + cw / 2 {
+                    self.players[pi].hv += cw*cw*cw / 100;
                 }
-                */
+                if px + pw / 2 < collision.x() + cw / 2 {
+                    self.players[pi].hv -= cw*cw*cw / 100;
+                }
+                if py + ph / 2 > collision.y() + ch / 2 {
+                    self.players[pi].vv += ch*ch*ch / 100;
+                }
+                if py + ph / 2 < collision.y() + ch / 2 {
+                    self.players[pi].vv -= ch*ch*ch / 100;
+                }
             }
             // Finally we apply movement
             {  // Borrow player here
